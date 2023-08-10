@@ -1,0 +1,96 @@
+-------------------------------------------
+Instrucciones de uso de la API Facturación:
+-------------------------------------------
+1) Dar de alta un Cliente (POST)
+
+http://localhost:8080/cliente
+Pasar por Body el siguiente json
+{
+    "nombre": "Inna",
+    "apellido": "Chorna",
+    "fechaNacimiento": "1987-01-01",
+    "dni": "93555300",
+    "domicilio": "Av.Cabildo 125"
+}
+
+2) Dar de alta 2 Productos (POST)
+http://localhost:8080/producto
+Pasar por body:
+{
+        "descripcion": "Celular Motorola G3",
+        "precio": 50000.0
+}
+{
+        "descripcion": "Funda Moto G3",
+        "precio": 150.0
+}
+
+
+3) Agregar stock al producto (POST)
+http://localhost:8080/stock
+Pasar por body:
+{
+  "id_stock": 1,
+  "producto": {
+    "id_producto": 1
+  },
+  "cantidad": 200
+}
+
+
+- Para modificar manualmente cantidad de algún producto en Stock, pasar por body (PATCH)::
+http://localhost:8080/stock/1
+{
+  "cantidad": 500
+}
+
+
+4) Dar de alta un Comprobante para el cliente 1 con 2 items vendidos (POST)
+
+http://localhost:8080/comprobante
+Pasar por Body:
+{
+  "cliente": {
+    "id_cliente": 1
+  },
+  "items": [
+    {
+      "producto": {
+        "id_producto": 1
+      },
+      "cantidad": 2
+    },
+    {
+      "producto": {
+        "id_producto": 2
+      },
+      "cantidad": 2
+    }
+  ],
+  "fecha": "2023-08-08"
+}
+
+
+5) Para modificar los datos del cliente pasar por body (PATCH):
+http://localhost:8080/cliente/1
+(Cambiód el domicilio del cliente id 1)
+{
+    "nombre": "Inna",
+    "apellido": "Chorna",
+    "fechaNacimiento": "1987-01-01",
+    "dni": "935155300",
+    "domicilio": "Ciudad de la Paz 2103"
+}
+
+
+
+- Verificar en la Consola de H2 las tablas:
+
+http://localhost:8080/h2-console/
+
+
+SELECT * FROM CLIENTE;
+SELECT * FROM PRODUCTO;
+SELECT * FROM COMPROBANTE;
+SELECT * FROM ITEM;
+SELECT * FROM STOCK;
