@@ -1,5 +1,8 @@
 package coder.tp.facturacion.service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import coder.tp.facturacion.entidad.*;
@@ -9,6 +12,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class ComprobanteService {
@@ -27,6 +31,9 @@ public class ComprobanteService {
 
     @Autowired
     private StockRepository stockRepository;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     public List<Comprobante> findAll() {
         return this.comprobanteRepository.findAll();
@@ -88,11 +95,32 @@ public class ComprobanteService {
             itemRepository.save(item);
         }
 
+        // Fecha del comprobante
+        Date fechaComprobante = obtenerFecha();
+        nuevoComprobante.setFecha(fechaComprobante);
+
+
         // Asigna el precio_total del comprobante
         nuevoComprobante.setPrecio_total(totalComprobante);
         comprobanteRepository.save(nuevoComprobante);
 
         return nuevoComprobante;
+    }
+
+    private Date obtenerFecha() {
+        WorldClock worldClock = this.restTemplate.getForObject("http://worldclockapi.com/api/json/utc/now", WorldClock.class);
+
+        String currentDateTime = worldClock.getCurrentDateTime();
+        // "2023-08-20T18:30Z"
+        try {
+            Date fecha = new SimpleDateFormat("yyyy-MM-dd'T'mm:ss'Z'").parse(currentDateTime);
+            System.out.println("Fecha recuperada mediante API: " + fecha);
+            return fecha;
+        } catch (ParseException e) {
+            e.printStackTrace();
+            Date fecha = new Date();
+            return fecha;
+        }
     }
 
     public Comprobante findById(Integer id) {

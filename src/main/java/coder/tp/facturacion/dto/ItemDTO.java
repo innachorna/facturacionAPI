@@ -6,12 +6,6 @@ public class ItemDTO {
     private float precioTotal;
     private Integer idProducto;
 
-    public ItemDTO(Integer idItem, Integer cantidad, float precioTotal) {
-        this.idItem = idItem;
-        this.cantidad = cantidad;
-        this.precioTotal = precioTotal;
-    }
-
     public ItemDTO(Integer idItem, Integer cantidad, float precioTotal, Integer idProducto) {
         this.idItem = idItem;
         this.cantidad = cantidad;

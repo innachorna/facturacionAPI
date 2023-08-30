@@ -1,17 +1,22 @@
 package coder.tp.facturacion.dto;
 
+import java.util.Date;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+@JsonInclude(Include.NON_NULL)
 public class ComprobanteDTO {
 
     private Integer id_comprobante;
-    private String fecha;
+    //private String fecha;
+    private Date fecha;
     private float precio_total;
 
     private ClienteDTO cliente;
     private List<ItemDTO> items;
 
-    public ComprobanteDTO(Integer id_comprobante, String fecha, float precio_total) {
+    public ComprobanteDTO(Integer id_comprobante, Date fecha, float precio_total) {
         this.id_comprobante = id_comprobante;
         this.fecha = fecha;
         this.precio_total = precio_total;
@@ -28,11 +33,11 @@ public class ComprobanteDTO {
         this.id_comprobante = id_comprobante;
     }
 
-    public String getFecha() {
+    public Date getFecha() {
         return fecha;
     }
 
-    public void setFecha(String fecha) {
+    public void setFecha(Date fecha) {
         this.fecha = fecha;
     }
 

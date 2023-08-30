@@ -73,7 +73,7 @@ public class ComprobanteController {
 
         List<ItemDTO> itemDTOs = new ArrayList<>();
         for (Item item : comprobante.getItems()) {
-            itemDTOs.add(new ItemDTO(item.getId_item(), item.getCantidad(), item.getPrecio_total()));
+            itemDTOs.add(new ItemDTO(item.getId_item(), item.getCantidad(), item.getPrecio_total(), item.getProducto().getId_producto()));
         }
         dto.setItems(itemDTOs);
 

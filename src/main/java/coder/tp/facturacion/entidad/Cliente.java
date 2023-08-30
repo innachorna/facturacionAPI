@@ -1,11 +1,14 @@
 package coder.tp.facturacion.entidad;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import jakarta.persistence.*;
 
 import java.util.List;
 
 @Entity
 @Table(name="CLIENTE")
+@JsonInclude(Include.NON_NULL)
 public class Cliente {
 
     @Id

@@ -1,9 +1,10 @@
 package coder.tp.facturacion.dto;
 
-import coder.tp.facturacion.entidad.Comprobante;
-
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+@JsonInclude(Include.NON_NULL)
 public class ClienteDTO {
     private Integer idCliente;
     private String nombre;

@@ -2,6 +2,7 @@ package coder.tp.facturacion.entidad;
 
 import jakarta.persistence.*;
 
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -14,7 +15,8 @@ public class Comprobante {
     private Integer id_comprobante;
 
     @Column(name = "fecha")
-    private String fecha;
+    //private String fecha;
+    private Date fecha;
 
     @Column(name = "precio_total")
     private float precio_total;
@@ -26,12 +28,19 @@ public class Comprobante {
     @OneToMany(mappedBy="comprobante", cascade = CascadeType.ALL)
     private List<Item> items;
 
-    public Comprobante(String fecha) {
+    public Comprobante(Date fecha) {
         super();
         this.fecha = fecha;
     }
 
-    public Comprobante(Integer id_comprobante, String fecha, float precio_total, Cliente cliente, List<Item> items) {
+    public Comprobante(Integer id_comprobante, float precio_total, Cliente cliente, List<Item> items) {
+        this.id_comprobante = id_comprobante;
+        this.precio_total = precio_total;
+        this.cliente = cliente;
+        this.items = items;
+    }
+
+    public Comprobante(Integer id_comprobante, Date fecha, float precio_total, Cliente cliente, List<Item> items) {
         this.id_comprobante = id_comprobante;
         this.fecha = fecha;
         this.precio_total = precio_total;
@@ -51,11 +60,11 @@ public class Comprobante {
         this.id_comprobante = id_comprobante;
     }
 
-    public String getFecha() {
+    public Date getFecha() {
         return fecha;
     }
 
-    public void setFecha(String fecha) {
+    public void setFecha(Date fecha) {
         this.fecha = fecha;
     }
 
