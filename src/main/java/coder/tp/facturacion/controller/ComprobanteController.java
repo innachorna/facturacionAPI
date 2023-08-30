@@ -50,10 +50,6 @@ public class ComprobanteController {
 
         return comprobanteDTO;
 
-/**
-        Comprobante nuevoComprobante = comprobanteService.save(comprobante);
-        return ResponseEntity.ok(nuevoComprobante);
-*/
     }
 
     private ComprobanteDTO convertToDTO(Comprobante comprobante) {
