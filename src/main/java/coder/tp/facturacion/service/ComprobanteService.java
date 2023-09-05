@@ -119,6 +119,7 @@ public class ComprobanteService {
         } catch (ParseException e) {
             e.printStackTrace();
             Date fecha = new Date();
+            System.out.println("Fecha java: " + fecha);
             return fecha;
         }
     }

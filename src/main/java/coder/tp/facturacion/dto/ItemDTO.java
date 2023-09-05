@@ -1,25 +1,28 @@
 package coder.tp.facturacion.dto;
 
 public class ItemDTO {
-    private Integer idItem;
+    private Integer id_item;
     private Integer cantidad;
     private float precioTotal;
-    private Integer idProducto;
+    private ProductoDTO producto;
 
-    public ItemDTO(Integer idItem, Integer cantidad, float precioTotal, Integer idProducto) {
-        this.idItem = idItem;
+    public ItemDTO(Integer id_item, Integer cantidad, float precioTotal, ProductoDTO producto) {
+        this.id_item = id_item;
         this.cantidad = cantidad;
         this.precioTotal = precioTotal;
-        this.idProducto = idProducto;
+        this.producto = producto;
     }
 
-    // Getters y setters
-    public Integer getIdItem() {
-        return idItem;
+    public ItemDTO() {
+        super();
     }
 
-    public void setIdItem(Integer idItem) {
-        this.idItem = idItem;
+    public Integer getId_item() {
+        return id_item;
+    }
+
+    public void setId_item(Integer id_item) {
+        this.id_item = id_item;
     }
 
     public Integer getCantidad() {
@@ -38,11 +41,11 @@ public class ItemDTO {
         this.precioTotal = precioTotal;
     }
 
-    public Integer getIdProducto() {
-        return idProducto;
+    public ProductoDTO getProducto() {
+        return producto;
     }
 
-    public void setIdProducto(Integer idProducto) {
-        this.idProducto = idProducto;
+    public void setProducto(ProductoDTO producto) {
+        this.producto = producto;
     }
 }
