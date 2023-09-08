@@ -1,10 +1,7 @@
 package coder.tp.facturacion.controller;
 
-import java.util.ArrayList;
 import java.util.List;
-
 import coder.tp.facturacion.dto.ProductoDTO;
-import coder.tp.facturacion.entidad.Producto;
 import coder.tp.facturacion.service.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,64 +24,30 @@ public class ProductoController {
 
     @GetMapping
     public ResponseEntity<List<ProductoDTO>> findAll() {
-        List<Producto> productos = productoService.findAll();
-        List<ProductoDTO> productosDTO = new ArrayList<>();
-
-        for (Producto producto : productos) {
-            ProductoDTO productoDTO = convertToDto(producto);
-            productosDTO.add(productoDTO);
-        }
+        List<ProductoDTO> productosDTO = productoService.findAll();
 
         if (productosDTO.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-
         return ResponseEntity.ok(productosDTO);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductoDTO> one(@PathVariable Integer id) {
-        Producto producto = productoService.findById(id);
+        ProductoDTO productoDTO = productoService.one(id);
 
-        if (producto == null) {
+        if (productoDTO == null) {
             return ResponseEntity.notFound().build();
         }
-
-        return ResponseEntity.ok(convertToDto(producto));
+        return ResponseEntity.ok(productoDTO);
     }
 
     @PostMapping
     public ResponseEntity<?> newEntity(@RequestBody ProductoDTO productoDTO) {
-        Producto producto = convertToEntity(productoDTO);
-        Producto productoGuardado = productoService.save(producto);
-        ProductoDTO productoGuardadoDTO = convertToDto(productoGuardado);
-
+        ProductoDTO productoGuardadoDTO = productoService.newEntity(productoDTO);
         if (productoGuardadoDTO == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Producto existente");
-        } else {
-            return ResponseEntity.status(HttpStatus.CREATED).body(productoGuardadoDTO);
         }
-    }
-
-    private ProductoDTO convertToDto(Producto producto) {
-        if (producto == null) {
-            return null;
-        }
-        ProductoDTO productoDTO = new ProductoDTO();
-        productoDTO.setId_producto(producto.getId_producto());
-        productoDTO.setDescripcion(producto.getDescripcion());
-        productoDTO.setPrecio(producto.getPrecio());
-        return productoDTO;
-    }
-
-    private Producto convertToEntity(ProductoDTO productoDTO) {
-        if (productoDTO == null) {
-            return null;
-        }
-        Producto producto = new Producto();
-        producto.setId_producto(productoDTO.getId_producto());
-        producto.setDescripcion(productoDTO.getDescripcion());
-        producto.setPrecio(productoDTO.getPrecio());
-        return producto;
+        return ResponseEntity.status(HttpStatus.CREATED).body(productoGuardadoDTO);
     }
 }

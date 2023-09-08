@@ -1,7 +1,8 @@
 package coder.tp.facturacion.service;
 
+import java.util.ArrayList;
 import java.util.List;
-
+import coder.tp.facturacion.dto.ProductoDTO;
 import coder.tp.facturacion.entidad.Producto;
 import coder.tp.facturacion.entidad.Stock;
 import coder.tp.facturacion.repository.ProductoRepository;
@@ -18,26 +19,41 @@ public class ProductoService {
     @Autowired
     private StockRepository stockRepository;
 
+    public List<ProductoDTO> findAll() {
+        List<Producto> productos = productoRepository.findAll();
+        List<ProductoDTO> productosDTO = new ArrayList<>();
 
-    public List<Producto> findAll() {
-        return this.productoRepository.findAll();
+        for (Producto producto : productos) {
+            ProductoDTO productoDTO = convertToDto(producto);
+            productosDTO.add(productoDTO);
+        }
+        return productosDTO;
     }
 
     public Producto save(Producto producto) {
-        // Verificar si el producto existe en la base de datos
+        return productoRepository.save(producto);
+    }
+
+    public ProductoDTO newEntity(ProductoDTO productoDTO) {
+        Producto producto = convertToEntity(productoDTO);
+
+        // Verificar que el producto no exista en la base de datos
         String descripcion = producto.getDescripcion();
         if (productoRepository.existsByDescripcion(descripcion)) {
             return null;
         }
 
-        Producto nuevoProducto = productoRepository.save(producto);
+        Producto nuevoProducto = save(producto);
+        // Inicialmente sin stock, cantidad en null
+        generarStock(nuevoProducto);
 
+        return convertToDto(nuevoProducto);
+    }
+
+    private void generarStock(Producto nuevoProducto) {
         Stock stock = new Stock();
         stock.setProducto(nuevoProducto);
-        // Inicialmente sin stock, cargar la cantidad con el metodo PATCH.
         stockRepository.save(stock);
-
-        return nuevoProducto;
     }
 
     public Producto findById(Integer id) {
@@ -49,6 +65,36 @@ public class ProductoService {
             System.out.println("Producto inexistente");
             return null;
         }
+    }
+
+    public ProductoDTO one(Integer id) {
+        Producto producto = findById(id);
+        if (producto == null) {
+            return null;
+        }
+        return convertToDto(producto);
+    }
+
+    private ProductoDTO convertToDto(Producto producto) {
+        if (producto == null) {
+            return null;
+        }
+        ProductoDTO productoDTO = new ProductoDTO();
+        productoDTO.setId_producto(producto.getId_producto());
+        productoDTO.setDescripcion(producto.getDescripcion());
+        productoDTO.setPrecio(producto.getPrecio());
+        return productoDTO;
+    }
+
+    private Producto convertToEntity(ProductoDTO productoDTO) {
+        if (productoDTO == null) {
+            return null;
+        }
+        Producto producto = new Producto();
+        producto.setId_producto(productoDTO.getId_producto());
+        producto.setDescripcion(productoDTO.getDescripcion());
+        producto.setPrecio(productoDTO.getPrecio());
+        return producto;
     }
 }
 
