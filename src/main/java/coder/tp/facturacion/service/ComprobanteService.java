@@ -6,9 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import coder.tp.facturacion.entidad.*;
-import coder.tp.facturacion.exception.StockInsuficienteException;
 import coder.tp.facturacion.repository.*;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,29 +39,33 @@ public class ComprobanteService {
 
     @Transactional
     public Comprobante save(Comprobante comprobante) {
-        // Asigno al cliente al Comprobante
-        Integer clienteId = comprobante.getCliente().getId_cliente();
-        Cliente clienteExistente = clienteRepository.getById(clienteId);
 
-        if (clienteExistente != null) {
+        Boolean existeCliente = existeCliente(comprobante.getCliente());
+
+        Boolean existenProductos = existenProductos(comprobante.getItems());
+
+        Boolean existeStock = existeStock(comprobante.getItems());
+
+        if (existeCliente && existenProductos && existeStock) {
+
+            // Asigno al cliente al Comprobante
+            Integer clienteId = comprobante.getCliente().getId_cliente();
+            Cliente clienteExistente = clienteRepository.getById(clienteId);
+
             comprobante.setCliente(clienteExistente);
-        } else {
-            throw new EntityNotFoundException("No se encontró el cliente con ID: " + clienteId);
-        }
 
-        Comprobante nuevoComprobante = comprobanteRepository.save(comprobante);
+            Comprobante nuevoComprobante = comprobanteRepository.save(comprobante);
 
-        float totalComprobante = 0.0f;
+            float totalComprobante = 0.0f;
 
-        for (Item item : comprobante.getItems()) {
-            // Asigno el comprobante al item
-            item.setComprobante(nuevoComprobante);
+            for (Item item : comprobante.getItems()) {
+                // Asigno el comprobante al item
+                item.setComprobante(nuevoComprobante);
 
-            // Asocio el producto al item (Producto ya existente en la tabla de Productos, relación unidireccional)
-            Integer productoId = item.getProducto().getId_producto();
-            Producto productoExistente = productoRepository.getById(productoId);
+                // Asocio el producto al item (Producto ya existente en la tabla de Productos, relación unidireccional)
+                Integer productoId = item.getProducto().getId_producto();
+                Producto productoExistente = productoRepository.getById(productoId);
 
-            if (productoExistente != null) {
                 item.setProducto(productoExistente);
 
                 // Calcula el precio_total del item
@@ -79,40 +81,66 @@ public class ComprobanteService {
                 Stock stock = stockRepository.findByProducto(productoExistente);
                 int cantidadEnStock = stock.getCantidad();
 
-                if (stock == null || cantidadEnStock < cantidadVendida) {
-                    throw new StockInsuficienteException("Stock insuficiente para el producto: " + productoExistente.getDescripcion());
-                }
-
                 int nuevoStock = cantidadEnStock - cantidadVendida;
                 stock.setCantidad(nuevoStock);
                 stockRepository.save(stock);
 
-            } else {
-                // Manejo de error si no se encuentra el producto por su ID
-                throw new EntityNotFoundException("No se encontró el producto con ID: " + productoId);
+                itemRepository.save(item);
             }
 
-            itemRepository.save(item);
+            // Fecha del comprobante
+            Date fechaComprobante = obtenerFecha();
+            nuevoComprobante.setFecha(fechaComprobante);
+
+
+            // Asigna el precio_total del comprobante
+            nuevoComprobante.setPrecio_total(totalComprobante);
+            comprobanteRepository.save(nuevoComprobante);
+
+            return nuevoComprobante;
+        } else {
+            return null;
         }
+    }
 
-        // Fecha del comprobante
-        Date fechaComprobante = obtenerFecha();
-        nuevoComprobante.setFecha(fechaComprobante);
+    private Boolean existeStock(List<Item> items) {
+        for (Item item : items) {
+            Integer productoId = item.getProducto().getId_producto();
+            Integer cantidadRequerida = item.getCantidad();
 
+            // Busco el registro de Stock para el producto del comprobante
+            Stock stock = stockRepository.findByProductoId(productoId);
 
-        // Asigna el precio_total del comprobante
-        nuevoComprobante.setPrecio_total(totalComprobante);
-        comprobanteRepository.save(nuevoComprobante);
+            // Si no se encuentra el stock o la cantidad requerida es mayor que el stock disponible, retorna false
+            if (stock == null || stock.getCantidad() == null || cantidadRequerida > stock.getCantidad()) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-        return nuevoComprobante;
+    private Boolean existenProductos(List<Item> items) {
+        for (Item item : items) {
+            var idProducto = item.getProducto().getId_producto();
+            var opProducto = this.productoRepository.findById(idProducto);
+            if (opProducto.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private Boolean existeCliente(Cliente cliente) {
+        var opCliente = this.clienteRepository.findById(cliente.getId_cliente());
+        return !opCliente.isEmpty();
     }
 
     private Date obtenerFecha() {
-        WorldClock worldClock = this.restTemplate.getForObject("http://worldclockapi.com/api/json/utc/now", WorldClock.class);
-
-        String currentDateTime = worldClock.getCurrentDateTime();
         // "2023-08-20T18:30Z"
         try {
+            WorldClock worldClock = this.restTemplate.getForObject("http://worldclockapi.com/api/json/utc/now", WorldClock.class);
+            String currentDateTime = worldClock.getCurrentDateTime();
+
             Date fecha = new SimpleDateFormat("yyyy-MM-dd'T'mm:ss'Z'").parse(currentDateTime);
             System.out.println("Fecha recuperada mediante API: " + fecha);
             return fecha;

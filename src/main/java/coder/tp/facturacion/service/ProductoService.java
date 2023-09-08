@@ -24,11 +24,17 @@ public class ProductoService {
     }
 
     public Producto save(Producto producto) {
+        // Verificar si el producto existe en la base de datos
+        String descripcion = producto.getDescripcion();
+        if (productoRepository.existsByDescripcion(descripcion)) {
+            return null;
+        }
+
         Producto nuevoProducto = productoRepository.save(producto);
 
         Stock stock = new Stock();
         stock.setProducto(nuevoProducto);
-        // Inicialmente sin stock, actualizar la cantidad con el metodo PATCH.
+        // Inicialmente sin stock, cargar la cantidad con el metodo PATCH.
         stockRepository.save(stock);
 
         return nuevoProducto;

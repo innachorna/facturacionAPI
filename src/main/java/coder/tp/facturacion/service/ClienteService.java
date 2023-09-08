@@ -19,7 +19,15 @@ public class ClienteService {
     }
 
     public Cliente save(Cliente cliente) {
-        return this.clienteRepository.save(cliente);
+
+        // Verificar si el cliente existe en la base de datos
+        Integer dni = cliente.getDni();
+        if (clienteRepository.existsByDni(dni)) {
+            return null;
+        }
+
+        Cliente nuevoCliente = clienteRepository.save(cliente);
+        return nuevoCliente;
     }
 
     public Cliente findById(Integer id) {

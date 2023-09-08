@@ -57,13 +57,17 @@ public class ComprobanteController {
     }
 
     @PostMapping
-    public ResponseEntity<ComprobanteDTO> newEntity(@RequestBody ComprobanteDTO comprobanteDTO) {
+    public ResponseEntity<?> newEntity(@RequestBody ComprobanteDTO comprobanteDTO) {
         Comprobante comprobante = convertToEntity(comprobanteDTO);
 
         Comprobante nuevoComprobante = comprobanteService.save(comprobante);
         ComprobanteDTO nuevoComprobanteDTO = convertToDTO(nuevoComprobante);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoComprobanteDTO);
+        if (nuevoComprobanteDTO == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Producto o cliente inexistente o falta de stock.");
+        } else {
+            return ResponseEntity.status(HttpStatus.CREATED).body(nuevoComprobanteDTO);
+        }
     }
 
     private ComprobanteDTO convertToDTO(Comprobante comprobante) {

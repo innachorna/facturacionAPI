@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class ComprobanteDTO {
 
     private Integer id_comprobante;
-    //private String fecha;
     private Date fecha;
     private float precio_total;
 
@@ -20,6 +19,11 @@ public class ComprobanteDTO {
         this.id_comprobante = id_comprobante;
         this.fecha = fecha;
         this.precio_total = precio_total;
+    }
+
+    public ComprobanteDTO(ClienteDTO cliente, List<ItemDTO> items) {
+        this.cliente = cliente;
+        this.items = items;
     }
 
     public ComprobanteDTO() {

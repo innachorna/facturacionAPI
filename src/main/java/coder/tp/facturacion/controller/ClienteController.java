@@ -52,12 +52,16 @@ public class ClienteController {
     }
 
     @PostMapping
-    public ResponseEntity<ClienteDTO> newEntity(@RequestBody ClienteDTO clienteDTO) {
+    public ResponseEntity<?> newEntity(@RequestBody ClienteDTO clienteDTO) {
         Cliente cliente = convertToEntity(clienteDTO);
         Cliente nuevoCliente = clienteService.save(cliente);
         ClienteDTO clienteGuardadoDTO = convertToDto(nuevoCliente);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(clienteGuardadoDTO);
+        if (clienteGuardadoDTO == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cliente existente");
+        } else {
+            return ResponseEntity.status(HttpStatus.CREATED).body(clienteGuardadoDTO);
+        }
     }
 
     @PatchMapping("/{id}")

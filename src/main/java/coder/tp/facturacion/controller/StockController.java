@@ -65,22 +65,16 @@ public class StockController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<StockDTO> updateStock(@PathVariable Integer id, @RequestBody StockDTO nuevoStockDTO) {
-        Stock stock = stockService.findById(id);
 
-        if (stock == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        int cantDeStockASetear = nuevoStockDTO.getCantidad();
-
-        if (cantDeStockASetear > 0) {
-            stock.setCantidad(cantDeStockASetear);
-        }
-
-        Stock stockActualizado = stockService.save(stock);
+        Stock nuevoStock = convertToEntity(nuevoStockDTO);
+        Stock stockActualizado = stockService.actualizarStock(nuevoStock, id);
         StockDTO stockActualizadoDTO = convertToDTO(stockActualizado);
 
-        return ResponseEntity.ok(stockActualizadoDTO);
+        if (stockActualizadoDTO == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(stockActualizadoDTO);
+        }
     }
 
     private StockDTO convertToDTO(Stock stock) {
@@ -110,13 +104,14 @@ public class StockController {
 
         ProductoDTO productoDTO = stockDTO.getProducto();
 
-        Producto producto = new Producto();
-        producto.setId_producto(productoDTO.getId_producto());
-        producto.setDescripcion(productoDTO.getDescripcion());
-        producto.setPrecio(productoDTO.getPrecio());
+        if (productoDTO != null) {
+            Producto producto = new Producto();
+            producto.setId_producto(productoDTO.getId_producto());
+            producto.setDescripcion(productoDTO.getDescripcion());
+            producto.setPrecio(productoDTO.getPrecio());
 
-        stock.setProducto(producto);
-
+            stock.setProducto(producto);
+        }
         return stock;
     }
 }

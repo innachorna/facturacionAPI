@@ -54,16 +54,17 @@ public class ProductoController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductoDTO> newEntity(@RequestBody ProductoDTO productoDTO) {
+    public ResponseEntity<?> newEntity(@RequestBody ProductoDTO productoDTO) {
         Producto producto = convertToEntity(productoDTO);
-
         Producto productoGuardado = productoService.save(producto);
-
         ProductoDTO productoGuardadoDTO = convertToDto(productoGuardado);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(productoGuardadoDTO);
+        if (productoGuardadoDTO == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Producto existente");
+        } else {
+            return ResponseEntity.status(HttpStatus.CREATED).body(productoGuardadoDTO);
+        }
     }
-
 
     private ProductoDTO convertToDto(Producto producto) {
         if (producto == null) {
